@@ -9,7 +9,7 @@ import React from "react";
 interface ProductPageProps {
     params: {
         productId: string;
-    }
+    },
 }
 
 const ProductPage: React.FC<ProductPageProps> = async ({
@@ -19,7 +19,7 @@ const ProductPage: React.FC<ProductPageProps> = async ({
     const suggestedProducts = await getProducts({
         categoryId: product?.category?.id
 
-    })
+    });
     return ( 
         <div className="bg-white">
             <Container>
