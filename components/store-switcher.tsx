@@ -3,7 +3,13 @@
 import React, { useState } from "react";
 import { Store } from "@prisma/client";
 import { useParams, useRouter } from "next/navigation";
-import { Check, ChevronsUpDown, PlusCircle, StethoscopeIcon, Store as StoreIcon} from "lucide-react";
+import { 
+    Check, 
+    ChevronsUpDown, 
+    PlusCircle, 
+    StethoscopeIcon, 
+    Store as StoreIcon
+    } from "lucide-react";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useStoreModal } from "@/hooks/use-store-modal";
