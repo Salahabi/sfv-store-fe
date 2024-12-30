@@ -1,3 +1,4 @@
+"use client"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Copy, Server } from "lucide-react";
 import { Badge, BadgeProps } from "@/components/ui/badge";
@@ -27,7 +28,7 @@ export const ApiAlert: React.FC<ApiAlertProps> = ({
 }) => {
     const onCopy = () => {
         navigator.clipboard.writeText(description);
-        toast.success("API Route copied tot eh clipboard")
+        toast.success("API Route copied to the clipboard")
 
     }
     return (
