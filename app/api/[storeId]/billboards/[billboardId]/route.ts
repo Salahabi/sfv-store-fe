@@ -3,9 +3,11 @@ import { auth } from "@clerk/nextjs/server";
 import { NextFetchEvent, NextResponse } from "next/server";
 
 export async function GET(
-    req: Request, //although it is not used but it has to be here as DELET use the second argument
-    { params }: { params: { billboardId: string }}
+    //although it is not used but it has to be here as DELET use the second argument
+    req: Request,
+    props: { params: { billboardId: string }}
 ) {
+    const { params } = props;
     try {
         // const {storeId} = await params
         
@@ -27,9 +29,11 @@ export async function GET(
 };
 
 export async function PATCH(
-    req: Request, //although it is not used but it has to be here as DELET use the second argument
-    { params }: { params: { storeId: string, billboardId: string }}
+    //although it is not used but it has to be here as DELET use the second argument
+    req: Request,
+    props: { params: Promise<{ storeId: string, billboardId: string }>}
 ) {
+    const params = await props.params;
     try {
         const { userId } = await auth();
         const body = await req.json();
@@ -84,9 +88,11 @@ export async function PATCH(
 };
 
 export async function DELETE(
-    req: Request, //although it is not used but it has to be here as DELET use the second argument
-    { params }: { params: { storeId: string, billboardId: string }}
+    //although it is not used but it has to be here as DELET use the second argument
+    req: Request,
+    props: { params: Promise<{ storeId: string, billboardId: string }>}
 ) {
+    const params = await props.params;
     try {
         const { userId } = await auth();
         // const {storeId} = await params
