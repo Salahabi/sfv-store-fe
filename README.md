@@ -40,3 +40,11 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 ----------------------- installed modules --------------
 npx shadcn@latest add dropdown-menu
 
+ npx prisma generate
+
+ npx prisma db push
+
+
+ npx shadcn@latest add select
+
+
