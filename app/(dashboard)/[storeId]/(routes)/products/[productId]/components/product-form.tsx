@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import * as z from 'zod'
 import { Category, Color, Image, Product, Size } from "@prisma/client";
 import { Heading } from "@/components/ui/heading";
@@ -35,19 +35,43 @@ interface ProductFromProps {
 }
 
 
+// Define a type for the image structure
+// type ImageType = {
+//     id?: string;
+//     productId?: string;
+//     url: string;
+//     createdAt?: Date;
+//     updatedAt?: Date;
+// };
+
+
+// Define proper types
+interface ImageType {
+    id?: string;
+    productId?: string;
+    url: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+}
 
 
 const formSchema = z.object({
     name: z.string().min(1),
-    images: z.object({ url: z.string() }).array(),
+    images: z.array(z.object({
+        id: z.string().optional(),
+        productId: z.string().optional(),
+        url: z.string(),
+        createdAt: z.date().optional(),
+        updatedAt: z.date().optional()
+    })).nonempty("At least one image is required."),
     price: z.coerce.number().min(1),
     categoryId: z.string().min(1),
     colorId: z.string().min(1),
     sizeId: z.string().min(1),
     isFeatured: z.boolean().default(false).optional(),
     isArchived: z.boolean().default(false).optional()
-    
-})
+});
+
 
 type ProductFormValues = z.infer<typeof formSchema>;
 
@@ -57,6 +81,13 @@ export const ProductForm: React.FC<ProductFromProps> = ({
     colors,
     sizes
 }) => {
+    useEffect(() => {
+        console.log("Initial Data received:", initialData);
+        if (initialData?.images) {
+            console.log("Initial images:", initialData.images);
+        }
+    }, [initialData]);
+    
 
     const params = useParams();
     const router = useRouter();
@@ -69,10 +100,17 @@ export const ProductForm: React.FC<ProductFromProps> = ({
     const toastMessage = initialData ? 'Product updated.' : 'Product created.'
     const action = initialData ? 'Save changes' : 'Create'
 
+
+    // Create a state to ensure images persistence
+    const [currentImages, setCurrentImages] = useState<ImageType[]>(initialData?.images || []);
+
     const form = useForm<ProductFormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: initialData ? {
             ...initialData,
+
+            images: currentImages,  // Keep the full image objects
+
             price: parseFloat(String(initialData?.price)), // This ensures proper conversion from Decimal
         } : {
             name: '',
@@ -86,19 +124,62 @@ export const ProductForm: React.FC<ProductFromProps> = ({
         }
     });
 
+    // Update form whenever currentImages changes
+    // Type-safe form update
+    // Update form with proper type casting
+    useEffect(() => {
+        // Cast the images array to any to bypass the tuple type check
+        form.setValue('images', currentImages as any, { 
+            shouldValidate: true,
+            shouldDirty: true 
+        });
+    }, [currentImages, form]);
+
+    
+    // useEffect(() => {
+    //     const imagesArray: ImageType[] = currentImages;
+    //     form.setValue('images', imagesArray, { 
+    //             shouldValidate: true,
+    //             shouldDirty: true
+    //         });
+    // }, [currentImages, form]);
+
+
+
+
+    useEffect(() => {
+        console.log("Current form values:", form.getValues());
+        console.log("Current images state:", currentImages);
+    }, [currentImages, form]);
+
+
     const onSubmit = async (data: ProductFormValues) => {
         try {
             setLoading(true);
+
+            if (currentImages.length === 0) {
+                toast.error("At least one image is required.");
+                return;
+            }
+
+
+            // Strip additional properties
+            const sanitizedData = {
+            ...data,
+            images: data.images.map((image) => ({ url: image.url })),
+            };
+
+
             if (initialData) {
-                await axios.patch(`/api/${params.storeId}/products/${params.productId}`, data)
+                await axios.patch(`/api/${params.storeId}/products/${params.productId}`, sanitizedData)
             } else {
-                await axios.post(`/api/${params.storeId}/products`, data)
+                await axios.post(`/api/${params.storeId}/products`, sanitizedData)
             }
             router.refresh();
             router.push(`/${params.storeId}/products`);
             toast.success(toastMessage)
         } catch(err) {
-            toast.error("Something went wrong.");
+            toast.error("Something went wrong." );
         } finally {
             setLoading(false)
         }
@@ -138,33 +219,40 @@ export const ProductForm: React.FC<ProductFromProps> = ({
             <Separator />
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-8">
-                    <FormField
-                                control={form.control}
-                                name="images"
-                                render={({ field }) => {
-                                    console.log("Form field value:", field.value);
-                                    return(
-                                        <FormItem>
-                                            <FormLabel>Images</FormLabel>
-                                            <FormControl>
-                                                <ImageUpload
-                                                    value={field.value.map((image) => image.url)} // Pass array of URLs
-                                                    disabled={loading}
-                                                    onChange={(urls: string[]) => {
-                                                        // Convert array of URLs to array of objects with `url` property
-                                                        field.onChange(urls.map((url) => ({ url })));
-                                                    }}
-                                                    onRemove={(url: string) => {
-                                                        // Remove the URL from the array
-                                                        field.onChange(field.value.filter((image) => image.url !== url));
-                                                    }}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )
+                <FormField
+                control={form.control}
+                name="images"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Images</FormLabel>
+                        <FormControl>
+                            <ImageUpload
+                                value={currentImages.map(image => image.url)}
+                                disabled={loading}
+                                onChange={(urls: string[]) => {
+                                    // Prevent duplicates by checking existing URLs
+                                    const existingUrls = new Set(currentImages.map(img => img.url));
+                                    const newUniqueImages: ImageType[] = urls
+                                        .filter(url => !existingUrls.has(url))       
+                                        .map(url => ({
+                                            url: url,
+                                            productId: initialData?.id,
+                                            createdAt: new Date(),
+                                            updatedAt: new Date()
+                                        }));
+                                    setCurrentImages(prevImages => [...prevImages, ...newUniqueImages]);
+                                }}
+                                onRemove={(url: string) => {
+                                    setCurrentImages(prevImages => 
+                                        prevImages.filter(image => image.url !== url)
+                                    );
                                 }}
                             />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
                     <div className='grid grid-cols-3 gap-8'>
                         <FormField
                             control={form.control} 
@@ -339,6 +427,29 @@ export const ProductForm: React.FC<ProductFromProps> = ({
                 </form>
             </Form>
             {/* <Separator /> */}
+            <div className="mt-4 p-4 bg-gray-50 rounded-md">
+                <p className="text-sm font-medium">Current Images Count: {currentImages.length}</p>
+                <pre className="mt-2 text-xs">
+                    {JSON.stringify(currentImages, null, 2)}
+                </pre>
+            </div>
         </>
     )
 }
+
+
+
+
+
+// <ImageUpload
+//     value={field.value.map((image) => image.url)} // Pass array of URLs
+//     disabled={loading}
+//     onChange={(urls: string[]) => {
+//         // Convert array of URLs to array of objects with `url` property
+//         field.onChange(urls.map((url) => ({ url })));
+//     }}
+//     onRemove={(url: string) => {
+//         // Remove the URL from the array
+//         field.onChange(field.value.filter((image) => image.url !== url));
+//     }}
+// />

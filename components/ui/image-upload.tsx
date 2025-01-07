@@ -22,31 +22,55 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
     const [isMounted, setIsMounted] = useState(false);
 
+    const [cummulativeUrls, setCummulativeUrls] = useState<string[]>([]);
+
     useEffect(() => {
         setIsMounted(true);
+        console.log("set Is Mounted..............."); 
     }, [])
     
-    useEffect(() => {
-        console.log("Image URLs:", value); // Log the image URLs
-    }, [value]);
+     // Update the parent component whenever cummulativeUrls changes
+     useEffect(() => {
+        onChange(cummulativeUrls);
+        console.log("Image cummulativeUrls length:", cummulativeUrls.length); // Log the image URLs
+    }, [cummulativeUrls]); // Trigger when cummulativeUrls changes
 
     const onSuccess = (result: any) => {
+        console.log("Cloudinary result:", result);
 
-        console.log("Cloudinary result:", result); // Log the result object
-
-        // Handle multiple uploaded files
         if (result.event === "success") {
-            // Extract the secure URL of the uploaded image
             const newUrl = result.info.secure_url;
-    
-            // Ensure the URL is valid before adding it to the array
             if (newUrl && typeof newUrl === "string") {
-                onChange([...value, newUrl]);
+                // Update cummulativeUrls with the new URL
+                setCummulativeUrls((prevUrls) => [...prevUrls, newUrl]);
             } else {
                 console.error("Invalid image URL:", newUrl);
             }
         }
     };
+
+    useEffect(() => {
+        console.log("Image URLs length:", value.length); // Log the image URLs
+    }, [value]);
+
+
+    // const onSuccess = (result: any) => {
+
+    //     console.log("Cloudinary result:", result); // Log the result object
+
+    //     // Handle multiple uploaded files
+    //     if (result.event === "success") {
+    //         // Extract the secure URL of the uploaded image
+    //         const newUrl = result.info.secure_url;
+    
+    //         // Ensure the URL is valid before adding it to the array
+    //         if (newUrl && typeof newUrl === "string") {
+    //             onChange([...value, newUrl]);
+    //         } else {
+    //             console.error("Invalid image URL:", newUrl);
+    //         }
+    //     }
+    // };
 
     if (!isMounted) {
         return null;
@@ -57,7 +81,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         <div>
             <div className='mb-4 flex items-center gap-4'>
                 {value
-                    .filter((url) => url).filter((url) => url && typeof url === "string") // Filter out invalid URLs
+                    .filter((url) => url && typeof url === "string") // Filter out invalid URLs
                     .map((url) => (
                     <div 
                         key={url} 

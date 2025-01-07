@@ -25,7 +25,7 @@ import { Input } from "@/components/ui/input";
 import { AlertModal } from "@/components/modals/alert-modal";
 // import { ApiAlert } from "@/components/ui/api-alert";
 // import { useOrigin } from "@/hooks/use-origin";
-import ImageUpload from "@/components/ui/image-upload";
+import ImageUploadBillboard from "@/components/ui/image-upload-billboard";
 
 
 const formSchema = z.object({
@@ -132,7 +132,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
                             <FormItem>
                                 <FormLabel>Background image</FormLabel>
                                 <FormControl>
-                                    <ImageUpload 
+                                    <ImageUploadBillboard 
                                         value={field.value ? [field.value] : []}
                                         disabled={loading}
                                         onChange={(url) => field.onChange(url)}
