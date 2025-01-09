@@ -48,3 +48,27 @@ npx shadcn@latest add dropdown-menu
  npx shadcn@latest add select
 
 
+
+
+
+STRIPE_API_KEY="sk_test_51HimwtCoLlyh0JLueaNyApwC2jSC6CmSGO9GzYd2Im9rRzfeOAusodYkecTShsKnedr0Iwcns4Qh3qZdN9VrHVIS00RCgRu56W"
+
+FRONTEND_STORE_URL=http://localhost:3001
+
+
+brew install stripe/stripe-cli/stripe
+
+strip login
+
+
+npx shadcn@latest add card
+
+npm i recharts
+
+npm i next-themes
+
+
+Way forward:
+- Scheleton in the menue
+- Loading state
+

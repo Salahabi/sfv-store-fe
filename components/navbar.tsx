@@ -7,6 +7,7 @@ import StoreSwitcher from "@/components/store-switcher";
 import { Store } from "lucide-react";
 
 import prismadb from "@/lib/prismadb";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const Navbar = async () => {
     const { userId} = await auth();
@@ -29,6 +30,7 @@ const Navbar = async () => {
                         <MainNav className="mx-6"/>
                 </div>
                 <div className="ml-auto flex items-center space-x-4">
+                    <ThemeToggle />
                 <UserButton {...{
                     afterSignOutUrl: "/"
                     } as const} />
