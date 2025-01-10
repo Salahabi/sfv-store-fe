@@ -5,19 +5,19 @@ import { NextFetchEvent, NextResponse } from "next/server";
 export async function GET(
     //although it is not used but it has to be here as DELET use the second argument
     req: Request,
-    props: { params: { billboardId: string }}
+    { params }: { params: Promise<{ billboardId: string }>}
 ) {
-    const { params } = props;
+
     try {
         // const {storeId} = await params
-        
-        if(!params.billboardId) {
+        const { billboardId } = await params;
+        if(!billboardId) {
             return new NextResponse("Billboard id is required", { status: 400 });
         }
 
         const billboard = await prismadb.billboard.findUnique({
             where: {
-                id: params.billboardId,
+                id: billboardId,
             }
         });
         return NextResponse.json(billboard);
