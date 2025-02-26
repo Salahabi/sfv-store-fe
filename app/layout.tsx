@@ -10,7 +10,7 @@ import { ToasterProvider } from '@/providers/toast-provider'
 import './globals.css'
 import prismadb from '@/lib/prismadb'
 import { ThemeProvider } from '@/providers/theme-provider'
-
+import  WebVitals  from './_components/web-vitals'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -29,6 +29,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={inter.className}>
+          <WebVitals />
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
             <ToasterProvider />
             <ModalProvider />
