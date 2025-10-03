@@ -11,6 +11,7 @@ import './globals.css'
 import prismadb from '@/lib/prismadb'
 import { ThemeProvider } from '@/providers/theme-provider'
 import  WebVitals  from './_components/web-vitals'
+import { ThemeWrapper } from '@/components/theme-wrapper'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -27,15 +28,15 @@ export default function RootLayout({
   // const store = prismadb.store
   return (
     <ClerkProvider>
-      <html lang="en">
+      <html lang="en" className="">
         <body className={inter.className}>
           <WebVitals />
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
             <ToasterProvider />
             <ModalProvider />
-              {children}
+            {children}
           </ThemeProvider>
-          </body>
+        </body>
       </html>
     </ClerkProvider>
   )

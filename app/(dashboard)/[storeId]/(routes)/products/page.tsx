@@ -25,6 +25,22 @@ const ProductsPage = async ({
         }
     })
 
+    // DEBUG: Log products and their categories
+    console.log('=== PRODUCTS DEBUG ===');
+    console.log('Total products found:', products.length);
+    products.forEach((product, index) => {
+        console.log(`Product ${index + 1}:`, {
+            name: product.name,
+            categoryId: product.categoryId,
+            categoryName: product.category?.name,
+            category: product.category
+        });
+    });
+    
+    // DEBUG: Log unique categories
+    const uniqueCategories = Array.from(new Set(products.map(p => p.category?.name)));
+    console.log('Unique categories found:', uniqueCategories);
+
     const formattedProducts: ProductColumn[] = products.map(item => ({
         id: item.id,
         name: item.name,

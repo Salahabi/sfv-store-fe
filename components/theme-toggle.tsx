@@ -14,6 +14,21 @@ import {
 
 export function ThemeToggle() {
   const { setTheme } = useTheme()
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    // Return a functionally identical but visually neutral button during SSR
+    return (
+      <Button variant="outline" size="icon">
+        <span className="h-[1.2rem] w-[1.2rem]"></span>
+        <span className="sr-only">Toggle theme</span>
+      </Button>
+    )
+  }
 
   return (
     <DropdownMenu>
