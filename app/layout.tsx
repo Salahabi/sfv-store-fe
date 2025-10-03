@@ -28,7 +28,7 @@ export default function RootLayout({
   // const store = prismadb.store
   return (
     <ClerkProvider>
-      <html lang="en" className="">
+      <html lang="en" suppressHydrationWarning>
         <body className={inter.className}>
           <WebVitals />
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
